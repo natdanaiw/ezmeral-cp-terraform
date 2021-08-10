@@ -1,0 +1,15 @@
+[ezmeral-controller]
+controller01 ansible_ssh_host=10.41.37.131 ansible_user=root ansible_ssh_pass=P@ssw0rd
+
+[ezmeral-gateway]
+gateway01 ansible_ssh_host=10.41.37.139 ansible_user=root ansible_ssh_pass=P@ssw0rd
+
+[ezmeral-k8snode]
+master01 ansible_ssh_host=10.41.37.91 ansible_user=root ansible_ssh_pass=P@ssw0rd
+worker01 ansible_ssh_host=10.41.37.92 ansible_user=root ansible_ssh_pass=P@ssw0rd
+worker02 ansible_ssh_host=10.41.37.93 ansible_user=root ansible_ssh_pass=P@ssw0rd
+
+[ezmeral-epic]
+epic01 ansible_ssh_host=10.41.37.61 ansible_user=root ansible_ssh_pass=P@ssw0rd
+epic02 ansible_ssh_host=10.41.37.62 ansible_user=root ansible_ssh_pass=P@ssw0rd
+

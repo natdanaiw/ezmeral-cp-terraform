@@ -1,0 +1,70 @@
+---
+ - hosts: 
+    - ezmeral-controller
+    - ezmeral-gateway
+    - ezmeral-k8snode
+    - ezmeral-epic
+   become: true
+   tasks:
+   - name: Put SELinux in permissive mode, logging actions that would be blocked.
+     selinux:
+      policy: targeted
+      state: permissive
+
+   - name: Stop and diable firewalld service
+     ansible.builtin.systemd:
+      name: firewalld
+      state: stopped    
+      enabled: no  
+
+   - name: Register with activationkey 
+     redhat_subscription:
+      state: present
+      activationkey: tle
+      org_id: "12920240"
+      force_register: yes
+
+   - name: Enable required repositories
+     rhsm_repository:
+      name: "{{ item }}"
+      state: enabled
+     with_items: 
+      - rhel-7-server-optional-rpms
+      - rhel-ha-for-rhel-7-server-rpms
+      - rhel-7-server-extras-rpms
+
+   - name: Install python
+     yum:
+      name:
+        - python 
+      state: latest
+
+ - hosts:
+    - ezmeral-k8snode
+   become: true
+   tasks:
+   - name: Remove swapfile from /etc/fstab
+     mount:
+      name: "{{ item }}"
+      fstype: swap
+      state: absent
+     with_items:
+      - swap
+      - none
+    
+   - name: Disable swap
+     command: swapoff -a
+     when: ansible_swaptotal_mb > 0
+
+ - hosts: 
+    - ezmeral-controller
+   become: true
+   tasks:
+   - name: Copy the install file to server location
+     copy: src=hpe-cp-rhel-release-5.3-3031.bin dest=/root/hpe-cp-rhel-release-5.3-3031.bin mode=0777
+
+   - name: Excute installation file
+     command: ./hpe-cp-rhel-release-5.3-3031.bin --skipeula --default-password P@ssw0rd
+     register: ezmeral_result
+
+   - debug: var=ezmeral_result.stdout_lines
